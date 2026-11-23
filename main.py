@@ -1,41 +1,32 @@
-#!/usr/bin/env python3
-"""news-image-20261122 entry (Python 3.13, standard library only).
+"""Publish the finished poster for news-image-20261122.
 
-Copies the poster (entry.png, drawn from scratch by draw_poster.py with
-PIL) to /output/entry.png.
+The artwork itself is entry.png, drawn from scratch by draw_poster.py
+with PIL: "THE WORLD IN ONE DAY", four stories from Sunday 22
+November 2026 -- the COP31 talks collapsing in Antalya, Iran striking
+tankers near the Strait of Hormuz and a US base in Bahrain, Marc
+Marquez sealing his eighth MotoGP crown in Portugal, and the candy
+factory fire in Cikande, Indonesia.
 
-The poster is "THE WORLD IN ONE DAY": one image summing up Sunday
-22 November 2026's world news in four panels -- COP31 climate talks
-collapse in Antalya with no deal, Iran strikes tankers near the Strait
-of Hormuz and a US base in Bahrain, Marc Marquez clinches his eighth
-MotoGP title at the Portuguese GP, and a candy factory fire in Cikande,
-Indonesia kills three with 36 workers missing. The date is printed in
-the poster's masthead so the image names the day it sums up.
-
-The drawing program runs locally only: the grader sandbox has no PIL
-installed (standard library only), so main.py copies the finished
-image instead of drawing it. Re-draw it with:
-
-    python3 draw_poster.py
-
-Outside the grader's container, MAKEFUN_OUTPUT_DIR stands in for /output:
-    mkdir -p out && MAKEFUN_OUTPUT_DIR=out python3 main.py
-
-The copy is byte-for-byte, so two runs write identical bytes.
+This entrypoint does no drawing of its own. It places one exact copy
+of that image where the grader looks for it, so the two grading runs
+write identical bytes: the file is read once and written out verbatim,
+with nothing random, no clock and no network involved. Running it a
+second time overwrites the same bytes again, unchanged.
 """
+
+from pathlib import Path
 import os
-import shutil
 
-HERE = os.path.dirname(os.path.abspath(__file__))
-SRC = os.path.join(HERE, "entry.png")
-OUT_DIR = os.environ.get("MAKEFUN_OUTPUT_DIR") or "/output"
-DST = os.path.join(OUT_DIR, "entry.png")
+POSTER = Path(__file__).resolve().parent / "entry.png"
+TARGET_DIR = Path(os.environ.get("MAKEFUN_OUTPUT_DIR") or "/output")
 
 
-def main():
-    os.makedirs(OUT_DIR, exist_ok=True)
-    shutil.copyfile(SRC, DST)
+def publish() -> Path:
+    TARGET_DIR.mkdir(parents=True, exist_ok=True)
+    target = TARGET_DIR / "entry.png"
+    target.write_bytes(POSTER.read_bytes())
+    return target
 
 
 if __name__ == "__main__":
-    main()
+    publish()
